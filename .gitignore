@@ -19,6 +19,9 @@ local_settings.py
 db.sqlite3
 media/
 staticfiles/
+*/migrations/*.py
+*/migrations/*.pyc
+!*/migrations/__init__.py
 
 # Node
 node_modules/
