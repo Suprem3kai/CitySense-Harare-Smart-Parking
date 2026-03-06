@@ -14,7 +14,7 @@ Target deployment city: **Harare, Zimbabwe**
 
 # Core Problem
 
-Drivers in urban areas spend significant time searching for parking spaces.  
+Drivers in urban areas spend signdificant time searching for parking spaces.  
 This increases:
 
 - fuel consumption
