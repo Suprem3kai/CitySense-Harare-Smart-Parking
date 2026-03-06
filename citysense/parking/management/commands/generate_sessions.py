@@ -6,14 +6,14 @@ from datetime import timedelta
 import random
 
 class Command(BaseCommand):
-    help = 'Generate 200 realistic parking sessions'
+    help = 'Generate 175 realistic parking sessions for UZ campus'
 
     def handle(self, *args, **kwargs):
         ParkingSession.objects.all().delete()
         
         user, _ = User.objects.get_or_create(
-            username='demo_user',
-            defaults={'email': 'demo@citysense.com'}
+            username='uz_student',
+            defaults={'email': 'student@uz.ac.zw'}
         )
         
         spots = list(ParkingSpot.objects.all())
@@ -24,22 +24,22 @@ class Command(BaseCommand):
         sessions = []
         now = timezone.now()
         
-        for i in range(200):
+        for i in range(175):
             spot = random.choice(spots)
             
-            is_active = random.random() < 0.3
+            is_active = random.random() < 0.35
             
             if is_active:
-                start_time = now - timedelta(minutes=random.randint(10, 180))
+                start_time = now - timedelta(minutes=random.randint(10, 240))
                 end_time = None
                 duration = None
             else:
-                start_time = now - timedelta(days=random.randint(0, 7), hours=random.randint(0, 23))
-                duration = random.randint(15, 240)
+                start_time = now - timedelta(days=random.randint(0, 14), hours=random.randint(0, 23))
+                duration = random.randint(15, 300)
                 end_time = start_time + timedelta(minutes=duration)
             
-            payment_status = random.choice(['paid', 'paid', 'paid', 'unpaid'])
-            parking_status = random.choice(['correct', 'correct', 'correct', 'correct', 'incorrect'])
+            payment_status = random.choice(['paid', 'paid', 'paid', 'unpaid', 'unpaid'])
+            parking_status = random.choice(['correct', 'correct', 'correct', 'incorrect', 'overstayed'])
             
             session = ParkingSession(
                 user=user,

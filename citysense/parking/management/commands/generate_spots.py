@@ -4,66 +4,48 @@ from sensors.models import Sensor
 import random
 
 class Command(BaseCommand):
-    help = 'Generate 50 realistic parking spots in actual parking areas around Harare CBD'
+    help = 'Generate 15 well-spread parking spots around University of Zimbabwe campus'
 
     def handle(self, *args, **kwargs):
         ParkingSpot.objects.all().delete()
         
-        # Actual parking locations in Harare CBD with real coordinates
-        parking_areas = [
-            # Joina City Parking
-            {'name': 'Joina City Parking', 'lat': -17.8295, 'lon': 31.0525, 'spots': 8, 'zone': 'CBD-A'},
+        base_lat = -17.7840
+        base_lon = 31.0535
+        
+        # 15 specific parking locations spread across campus
+        parking_locations = [
+            {'zone': 'UZ Main Gate', 'lat': base_lat + 0.0000, 'lon': base_lon + 0.0000, 'road': 'Main Gate Road'},
+            {'zone': 'UZ Main Gate', 'lat': base_lat + 0.0002, 'lon': base_lon + 0.0003, 'road': 'Main Gate Road'},
+            {'zone': 'UZ Main Gate', 'lat': base_lat - 0.0002, 'lon': base_lon - 0.0002, 'road': 'Entrance Drive'},
             
-            # Samora Machel Avenue street parking
-            {'name': 'Samora Machel Avenue', 'lat': -17.8252, 'lon': 31.0518, 'spots': 6, 'zone': 'CBD-A'},
+            {'zone': 'UZ Library', 'lat': base_lat - 0.0010, 'lon': base_lon + 0.0008, 'road': 'Library Parking'},
+            {'zone': 'UZ Library', 'lat': base_lat - 0.0012, 'lon': base_lon + 0.0010, 'road': 'Academic Way'},
+            {'zone': 'UZ Library', 'lat': base_lat - 0.0008, 'lon': base_lon + 0.0006, 'road': 'Library Parking'},
             
-            # Jason Moyo Avenue street parking
-            {'name': 'Jason Moyo Avenue', 'lat': -17.8268, 'lon': 31.0502, 'spots': 5, 'zone': 'CBD-A'},
+            {'zone': 'UZ Engineering', 'lat': base_lat + 0.0012, 'lon': base_lon - 0.0010, 'road': 'Engineering Block'},
+            {'zone': 'UZ Engineering', 'lat': base_lat + 0.0014, 'lon': base_lon - 0.0008, 'road': 'Faculty Road'},
+            {'zone': 'UZ Engineering', 'lat': base_lat + 0.0010, 'lon': base_lon - 0.0012, 'road': 'Engineering Block'},
             
-            # First Street parking bays
-            {'name': 'First Street', 'lat': -17.8242, 'lon': 31.0508, 'spots': 4, 'zone': 'CBD-B'},
+            {'zone': 'UZ Administration', 'lat': base_lat - 0.0008, 'lon': base_lon - 0.0012, 'road': 'Admin Block'},
+            {'zone': 'UZ Administration', 'lat': base_lat - 0.0010, 'lon': base_lon - 0.0010, 'road': 'Central Avenue'},
+            {'zone': 'UZ Administration', 'lat': base_lat - 0.0006, 'lon': base_lon - 0.0014, 'road': 'Admin Block'},
             
-            # Second Street parking bays
-            {'name': 'Second Street', 'lat': -17.8248, 'lon': 31.0512, 'spots': 4, 'zone': 'CBD-B'},
-            
-            # Nelson Mandela Avenue parking
-            {'name': 'Nelson Mandela Avenue', 'lat': -17.8275, 'lon': 31.0485, 'spots': 5, 'zone': 'CBD-B'},
-            
-            # Robert Mugabe Road parking
-            {'name': 'Robert Mugabe Road', 'lat': -17.8312, 'lon': 31.0542, 'spots': 4, 'zone': 'CBD-C'},
-            
-            # Julius Nyerere Way parking
-            {'name': 'Julius Nyerere Way', 'lat': -17.8282, 'lon': 31.0498, 'spots': 4, 'zone': 'CBD-C'},
-            
-            # Kwame Nkrumah Avenue parking
-            {'name': 'Kwame Nkrumah Avenue', 'lat': -17.8288, 'lon': 31.0515, 'spots': 3, 'zone': 'CBD-A'},
-            
-            # Baker Avenue parking
-            {'name': 'Baker Avenue', 'lat': -17.8298, 'lon': 31.0528, 'spots': 3, 'zone': 'CBD-C'},
-            
-            # Leopold Takawira Street parking
-            {'name': 'Leopold Takawira Street', 'lat': -17.8302, 'lon': 31.0532, 'spots': 4, 'zone': 'CBD-C'},
+            {'zone': 'UZ Sports Complex', 'lat': base_lat + 0.0015, 'lon': base_lon + 0.0015, 'road': 'Sports Ground'},
+            {'zone': 'UZ Sports Complex', 'lat': base_lat + 0.0017, 'lon': base_lon + 0.0013, 'road': 'Stadium Road'},
+            {'zone': 'UZ Sports Complex', 'lat': base_lat + 0.0013, 'lon': base_lon + 0.0017, 'road': 'Sports Ground'},
         ]
         
         spots = []
-        sensor_id = 1
-        
-        for area in parking_areas:
-            for i in range(area['spots']):
-                # Small offset for parking bay positions (5-10 meters apart)
-                lat_offset = random.uniform(-0.0001, 0.0001)  # ~10 meters
-                lon_offset = random.uniform(-0.0001, 0.0001)
-                
-                spot = ParkingSpot(
-                    latitude=area['lat'] + lat_offset,
-                    longitude=area['lon'] + lon_offset,
-                    status=random.choice(['available', 'available', 'available', 'occupied']),
-                    road_name=area['name'],
-                    zone=area['zone'],
-                    sensor_id=f'SENSOR_{sensor_id:04d}'
-                )
-                spots.append(spot)
-                sensor_id += 1
+        for i, loc in enumerate(parking_locations, 1):
+            spot = ParkingSpot(
+                latitude=loc['lat'],
+                longitude=loc['lon'],
+                status=random.choice(['available', 'available', 'occupied']),
+                road_name=loc['road'],
+                zone=loc['zone'],
+                sensor_id=f'UZ_{i:03d}'
+            )
+            spots.append(spot)
         
         ParkingSpot.objects.bulk_create(spots)
         
@@ -74,4 +56,4 @@ class Command(BaseCommand):
                 battery_level=random.randint(70, 100)
             )
         
-        self.stdout.write(self.style.SUCCESS(f'Successfully created {len(spots)} parking spots in real parking areas'))
+        self.stdout.write(self.style.SUCCESS(f'Successfully created {len(spots)} parking spots around UZ campus'))

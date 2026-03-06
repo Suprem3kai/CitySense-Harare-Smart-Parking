@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import ParkingMarker from '../components/ParkingMarker';
 import MapLegend from '../components/MapLegend';
 import DashboardStats from '../components/DashboardStats';
+import AnalyticsCharts from '../components/AnalyticsCharts';
 import { parkingAPI, sessionAPI } from '../services/api';
 import { getUserLocation, calculateDistance } from '../utils/helpers';
 
@@ -64,14 +65,14 @@ export default function MapView() {
 
   const userIcon = L.divIcon({
     className: 'user-marker',
-    html: '<div style="background-color: #007bff; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.4);"></div>',
-    iconSize: [18, 18],
+    html: '<div style="background-color: #3498db; width: 20px; height: 20px; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>',
+    iconSize: [20, 20],
   });
 
   return (
     <div style={styles.container}>
       <DashboardStats />
-      <MapContainer center={[-17.8292, 31.0522]} zoom={14} style={styles.map}>
+      <MapContainer center={[-17.7840, 31.0535]} zoom={16} style={styles.map}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {spots.map(spot => (
           <ParkingMarker key={spot.id} spot={spot} onSelect={handleSelectSpot} />
@@ -81,9 +82,11 @@ export default function MapView() {
             <Popup>Your Location</Popup>
           </Marker>
         )}
-        {route && <Polyline positions={route} color="#007bff" weight={3} />}
+        {route && <Polyline positions={route} color="#3498db" weight={4} />}
         <MapLegend />
       </MapContainer>
+      
+      <AnalyticsCharts />
       
       {selectedSpot && (
         <div style={styles.panel}>
@@ -103,12 +106,12 @@ export default function MapView() {
       )}
       
       {activeSession && (
-        <div style={{...styles.panel, top: '200px'}}>
+        <div style={{...styles.panel, top: '220px'}}>
           <h3 style={styles.panelTitle}>Active Session</h3>
           <div style={styles.panelInfo}>
             <p>Spot: {activeSession.parking_spot}</p>
           </div>
-          <button onClick={endParking} style={{...styles.button, background: '#dc3545'}}>
+          <button onClick={endParking} style={{...styles.button, background: '#e74c3c'}}>
             End Parking
           </button>
         </div>
@@ -129,34 +132,33 @@ const styles: any = {
   },
   panel: {
     position: 'absolute',
-    top: '120px',
-    left: '20px',
+    top: '200px',
+    right: '20px',
     background: 'white',
     padding: '20px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
     zIndex: 1000,
     minWidth: '280px',
   },
   panelTitle: {
     margin: '0 0 15px 0',
-    fontSize: '18px',
+    fontSize: '16px',
     color: '#2c3e50',
+    fontWeight: '600',
   },
   panelInfo: {
     fontSize: '14px',
-    lineHeight: '1.6',
+    lineHeight: '1.8',
   },
   button: {
     width: '100%',
     padding: '12px',
-    background: '#28a745',
+    background: '#27ae60',
     color: 'white',
     border: 'none',
-    borderRadius: '6px',
     cursor: 'pointer',
     marginTop: '15px',
     fontSize: '14px',
-    fontWeight: 'bold',
+    fontWeight: '600',
   }
 };

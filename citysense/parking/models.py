@@ -26,6 +26,7 @@ class ParkingSession(models.Model):
     PARKING_STATUS_CHOICES = [
         ('correct', 'Correct'),
         ('incorrect', 'Incorrect'),
+        ('overstayed', 'Overstayed'),
     ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     parking_spot = models.ForeignKey(ParkingSpot, on_delete=models.CASCADE)
