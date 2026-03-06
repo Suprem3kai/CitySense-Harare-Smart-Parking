@@ -3,6 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import ParkingMarker from '../components/ParkingMarker';
+import MapLegend from '../components/MapLegend';
+import DashboardStats from '../components/DashboardStats';
 import { parkingAPI, sessionAPI } from '../services/api';
 import { getUserLocation, calculateDistance } from '../utils/helpers';
 
@@ -62,37 +64,13 @@ export default function MapView() {
 
   const userIcon = L.divIcon({
     className: 'user-marker',
-    html: '<div style="background-color: #007bff; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white;"></div>',
-    iconSize: [16, 16],
+    html: '<div style="background-color: #007bff; width: 18px; height: 18px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.4);"></div>',
+    iconSize: [18, 18],
   });
 
   return (
     <div style={styles.container}>
-      <div style={styles.sidebar}>
-        <h2>CitySense</h2>
-        <div style={styles.stats}>
-          <p>Total Spots: {spots.length}</p>
-          <p>Available: {spots.filter(s => s.status === 'available').length}</p>
-        </div>
-        {selectedSpot && (
-          <div style={styles.panel}>
-            <h3>Selected Spot</h3>
-            <p>{selectedSpot.road_name}</p>
-            <p>Zone: {selectedSpot.zone}</p>
-            {userLocation && (
-              <p>Distance: {calculateDistance(userLocation.lat, userLocation.lng, selectedSpot.latitude, selectedSpot.longitude).toFixed(2)} km</p>
-            )}
-            {!activeSession && <button onClick={startParking} style={styles.button}>Start Parking</button>}
-          </div>
-        )}
-        {activeSession && (
-          <div style={styles.panel}>
-            <h3>Active Session</h3>
-            <p>Spot: {activeSession.parking_spot}</p>
-            <button onClick={endParking} style={{...styles.button, background: '#dc3545'}}>End Parking</button>
-          </div>
-        )}
-      </div>
+      <DashboardStats />
       <MapContainer center={[-17.8292, 31.0522]} zoom={14} style={styles.map}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {spots.map(spot => (
@@ -103,17 +81,82 @@ export default function MapView() {
             <Popup>Your Location</Popup>
           </Marker>
         )}
-        {route && <Polyline positions={route} color="blue" />}
+        {route && <Polyline positions={route} color="#007bff" weight={3} />}
+        <MapLegend />
       </MapContainer>
+      
+      {selectedSpot && (
+        <div style={styles.panel}>
+          <h3 style={styles.panelTitle}>Selected Spot</h3>
+          <div style={styles.panelInfo}>
+            <p><strong>{selectedSpot.road_name}</strong></p>
+            <p>Zone: {selectedSpot.zone}</p>
+            <p>ID: {selectedSpot.sensor_id}</p>
+            {userLocation && (
+              <p>Distance: {calculateDistance(userLocation.lat, userLocation.lng, selectedSpot.latitude, selectedSpot.longitude).toFixed(2)} km</p>
+            )}
+          </div>
+          {!activeSession && (
+            <button onClick={startParking} style={styles.button}>Start Parking</button>
+          )}
+        </div>
+      )}
+      
+      {activeSession && (
+        <div style={{...styles.panel, top: '200px'}}>
+          <h3 style={styles.panelTitle}>Active Session</h3>
+          <div style={styles.panelInfo}>
+            <p>Spot: {activeSession.parking_spot}</p>
+          </div>
+          <button onClick={endParking} style={{...styles.button, background: '#dc3545'}}>
+            End Parking
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
 const styles: any = {
-  container: { display: 'flex', height: '100vh' },
-  sidebar: { width: '300px', background: '#2c3e50', color: 'white', padding: '20px', overflowY: 'auto' },
-  map: { flex: 1 },
-  stats: { background: '#34495e', padding: '15px', borderRadius: '8px', marginBottom: '20px' },
-  panel: { background: '#34495e', padding: '15px', borderRadius: '8px', marginTop: '20px' },
-  button: { width: '100%', padding: '12px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginTop: '10px' }
+  container: {
+    position: 'relative',
+    height: '100vh',
+    width: '100vw',
+  },
+  map: {
+    height: '100%',
+    width: '100%',
+  },
+  panel: {
+    position: 'absolute',
+    top: '120px',
+    left: '20px',
+    background: 'white',
+    padding: '20px',
+    borderRadius: '12px',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+    zIndex: 1000,
+    minWidth: '280px',
+  },
+  panelTitle: {
+    margin: '0 0 15px 0',
+    fontSize: '18px',
+    color: '#2c3e50',
+  },
+  panelInfo: {
+    fontSize: '14px',
+    lineHeight: '1.6',
+  },
+  button: {
+    width: '100%',
+    padding: '12px',
+    background: '#28a745',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    marginTop: '15px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+  }
 };

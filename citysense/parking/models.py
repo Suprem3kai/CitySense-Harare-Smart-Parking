@@ -20,7 +20,12 @@ class ParkingSession(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('paid', 'Paid'),
+        ('unpaid', 'Unpaid'),
         ('failed', 'Failed'),
+    ]
+    PARKING_STATUS_CHOICES = [
+        ('correct', 'Correct'),
+        ('incorrect', 'Incorrect'),
     ]
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     parking_spot = models.ForeignKey(ParkingSpot, on_delete=models.CASCADE)
@@ -28,6 +33,7 @@ class ParkingSession(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     duration = models.IntegerField(null=True, blank=True)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+    parking_status = models.CharField(max_length=20, choices=PARKING_STATUS_CHOICES, default='correct')
     
     def __str__(self):
         return f"{self.user.username} - {self.parking_spot.sensor_id}"
